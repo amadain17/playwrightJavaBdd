@@ -3,19 +3,39 @@ package steps;
 import com.microsoft.playwright.*;
 import enums.SharedInfoTag;
 
+import java.nio.file.Paths;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static utilities.WebActions.getProperty;
+
 public class ScenarioContext {
+    public Browser browser;
+    BrowserType browserType = null;
     public Page page;
+    boolean headless = Boolean.parseBoolean(getProperty("headless"));
     public static Playwright playwright = Playwright.create();
-    public static Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));
-    ;
     public BrowserContext context;
     private final ConcurrentHashMap<String, Object> sharedInfo = new ConcurrentHashMap<>();
 
     public ScenarioContext() {
+        switch (getProperty("browser")) {
+            case "firefox":
+                browserType = playwright.firefox();
+                browser = browserType.launch(new BrowserType.LaunchOptions().setHeadless(headless));
+                break;
+            case "chrome":
+                browserType = playwright.chromium();
+                browser = browserType.launch(new BrowserType.LaunchOptions().setChannel("chrome").setHeadless(headless));
+                break;
+            case "webkit":
+                browserType = playwright.webkit();
+                browser = browserType.launch(new BrowserType.LaunchOptions().setHeadless(headless));
+                break;
+        }
         context = browser.newContext(
-                new Browser.NewContextOptions().setBaseURL("https://magento.softwaretestingboard.com")
+                new Browser.NewContextOptions().setBaseURL(getProperty("baseurl"))
+                        .setRecordVideoDir(Paths.get("target", "results","videos/"))
+                        .setRecordVideoSize(640, 480)
         );
 
         context.tracing().start(

@@ -33,12 +33,14 @@ public class ProductCard extends BaseModule {
         addToCompareButton = cardContainer.locator(".tocompare");
     }
 
-    public void selectSize(String size) {
+    public ProductCard selectSize(String size) {
         this.sizeOption.getByText(size).click();
+        return this;
     }
 
-    public void selectColor(String color) {
+    public ProductCard selectColor(String color) {
         this.cardContainer.hover();
         this.colorOption.getByLabel(color).click();
+        return this;
     }
 }

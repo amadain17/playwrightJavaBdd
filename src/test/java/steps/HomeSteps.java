@@ -20,17 +20,15 @@ public class HomeSteps extends BaseSteps {
         homePage = new HomePage(page);
     }
 
-    @Given("I am on the LUMA homepage")
+    @Given("^I am on the LUMA homepage$")
     public void iAmOnTheLumaHomepage() {
         homePage.open();
     }
 
-    @When("I add {string} {string} in {string} size to cart")
+    @When("^I add (.*?) coloured (.*?) in (.*?) size to cart$")
     public void iAddInSizeToCart(String color, String name, String size) {
         ProductCard productCard = homePage.getProductCardLocator(name);
-
-        productCard.selectColor(color);
-        productCard.selectSize(size);
+        productCard.selectColor(color).selectSize(size);
         productCard.addToCartButton.click();
         homePage.header.welcomeMessage.first().waitFor(
                 new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE)
@@ -44,6 +42,11 @@ public class HomeSteps extends BaseSteps {
                         .color(color)
                         .size(size)
         );
+    }
+
+    @Then("^I should see shopping cart counter to be (.*?)$")
+    public void iShouldSeeShoppingCartCounterToBe(String shoppingCartQuantity) {
+        assertThat(homePage.shoppingCartCounter).hasText(shoppingCartQuantity);
     }
 }
 
